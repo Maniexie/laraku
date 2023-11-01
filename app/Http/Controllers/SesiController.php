@@ -57,42 +57,43 @@ class SesiController extends Controller
             'phone' => 'required'
         ]);
 
-        User::create([
+        $infoRegister = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'phone' => $request->phone
+            'phone' => $request->phone,
+            'updated_at' => $request->updated_at,
             
         ]);
 
         
 
-        $infoRegister = $request->only('email','password');
-        Auth::attempt($infoRegister);
-        $request->session()->regenerate();
-        return redirect()->route('login');
+        // $infoRegister = $request->only('email','password');
+        // Auth::attempt($infoRegister);
+        // $request->session()->regenerate();
+        // return redirect()->route('login');
 
         
-            // try{
+            try{
 
-            //     DB::beginTransaction();
+                DB::beginTransaction();
 
-            //     $table = new User();
-            //     $table->name = $infoRegister['name'];
-            //     $table->email = $infoRegister['email'];
-            //     $table->password = bcrypt($infoRegister['password']);
-            //     $table->phone = $infoRegister['phone'];
-            //     $table->create_at = now();
-            //     $table->update_at = null;
-            //     $table->save();
+                $table = new User();
+                $table->name = $infoRegister['name'];
+                $table->email = $infoRegister['email'];
+                $table->password = bcrypt($infoRegister['password']);
+                $table->phone = $infoRegister['phone'];
+                $table->created_at = now();
+                $table->updated_at = null;
+                $table->save();
 
-            //     DB::commit();
-            //     return redirect('/');
-            // }
-            //  catch(\Exception $e) {
-            //     DB::rollBack();
-            //     return redirect('/register');
-            // }
+                DB::commit();
+                return redirect('/');
+            }
+             catch(\Exception $e) {
+                DB::rollBack();
+                return redirect('/register');
+            }
         
 
 

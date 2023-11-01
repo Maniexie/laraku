@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SesiController;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 
 /*
@@ -37,3 +38,12 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/logout',[SesiController::class ,'logout'])->name('logout');
 
 });
+
+
+// TESTING MODEL
+
+// Route::get('/cekdata', function(){
+//     foreach (User::all() as $pengguna){
+//         echo $pengguna->password;
+//     }
+// });

@@ -20,7 +20,9 @@ return new class extends Migration
             $table->integer('phone');
             $table->enum('role',['operator','keuangan','marketing'])->default('operator');
             $table->rememberToken();
-            $table->timestamps('');
+            $table->timestamps();
+            
+            
         });
     }
 
