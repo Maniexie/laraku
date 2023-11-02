@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use Validate;
 
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Auth\Notifications\VerifyEmail;
 
 
 class SesiController extends Controller
@@ -52,7 +54,8 @@ class SesiController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => ['required', 'string' , 
+                        Rule::unique('users')->ignore($request->id)],
             'password' => 'required',
             'phone' => 'required'
         ]);
@@ -66,34 +69,44 @@ class SesiController extends Controller
             
         ]);
 
-        
+        if ($infoRegister->fails()) {
+            return redirect('/register')
+                        ->withErrors($infoRegister)
+                        ->withInput();
+        }
 
+
+        //  $checkDuplicated = User::where($request->email)->first();
+
+        
+        
         // $infoRegister = $request->only('email','password');
         // Auth::attempt($infoRegister);
         // $request->session()->regenerate();
         // return redirect()->route('login');
-
         
-            try{
-
-                DB::beginTransaction();
-
-                $table = new User();
-                $table->name = $infoRegister['name'];
-                $table->email = $infoRegister['email'];
-                $table->password = bcrypt($infoRegister['password']);
-                $table->phone = $infoRegister['phone'];
-                $table->created_at = now();
-                $table->updated_at = null;
-                $table->save();
-
+        
+        try{
+            
+            DB::beginTransaction();
+            
+            $table = new User();
+            $table->name = $infoRegister['name'];
+            $table->email = $infoRegister['email'];
+            $table->password = bcrypt($infoRegister['password']);
+            $table->phone = $infoRegister['phone'];
+            $table->created_at = now();
+            $table->updated_at = null;
+            $table->save();
+            
                 DB::commit();
-                return redirect('/');
+                return redirect()->back()->with('error','Email sudah ada!!');
             }
              catch(\Exception $e) {
                 DB::rollBack();
-                return redirect('/register');
+                return redirect()->back()->with('nice','Selamat anda telah berhasil membuat akun!!');
             }
+
         
 
 
